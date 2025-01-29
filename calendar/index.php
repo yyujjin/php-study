@@ -6,7 +6,7 @@ $month = $_GET['month']??date('m');
 <a href="<?=prevButton($year,$month)?>">이전 달</a>
 <span><?=$year?>년 <?=$month?>월</span>
 <a href="<?=nextButton($year,$month)?>">다음 달</a>
-<a>오늘로 돌아가기</a>
+<a href="<?=todayButton()?>">오늘로 돌아가기</a>
 
 <table border="1">
     <tr>
@@ -25,7 +25,6 @@ $month = $_GET['month']??date('m');
 
 <?php
 
-
 //이후
 function nextButton($year,$month){
     if($month==12){
@@ -42,6 +41,10 @@ function prevButton($year,$month){
     return "?year=".$year."&month=".($month-1);
 }
 
+//오늘로 돌아가기
+function todayButton(){
+    return "?year=".date('Y')."&month=".date('m');
+}
 
 //달력 칸 만드는 함수
 function createDateCells($year,$month){

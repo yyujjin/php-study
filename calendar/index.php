@@ -46,6 +46,19 @@ function todayButton(){
     return "?year=".date('Y')."&month=".date('m');
 }
 
+//토요일은 파란색 일요일은 빨간색
+function getDayColor($j){
+    if($j==0){
+        echo "일욜 ";
+        return 'style="color: red;"';
+    }
+    if($j==6){
+        echo "토욜";
+        return 'style="color: blue;"';
+        
+    }
+}
+
 //달력 칸 만드는 함수
 function createDateCells($year,$month){
     $lastDay = date("t", strtotime("$year-$month-01"));
@@ -56,14 +69,15 @@ function createDateCells($year,$month){
         echo "<tr>";
         for($j=0; $j<7&&$day<=$lastDay; $j++){
             if($i===0&&$j<$startMonth){
-                echo "<td> </td>";
+                echo '<td></td>';
             }else{
-                echo "<td>".$day."</td>";
+                //echo '<td'.getDayColor($j).'>'.$day.'</td>';
+                echo "<td ".getDayColor($j).">".$day."</td>";
                 $day++;
             }
         }
         echo "</tr>";
     }
 }
-?>
 
+?>

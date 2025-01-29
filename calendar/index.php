@@ -46,16 +46,16 @@ function todayButton(){
     return "?year=".date('Y')."&month=".date('m');
 }
 
-//토요일은 파란색 일요일은 빨간색
-function getDayColor($j){
+//토요일: 파란색,일요일: 빨간색, 당일: 굵게
+function getDayColor($j,$day,$year,$month){
     if($j==0){
-        echo "일욜 ";
         return 'style="color: red;"';
     }
     if($j==6){
-        echo "토욜";
         return 'style="color: blue;"';
-        
+    }
+    if($day==date('d')&&$year==date('Y')&&$month==date('m')){
+        return 'style="font-weight: bold;"';
     }
 }
 
@@ -71,8 +71,7 @@ function createDateCells($year,$month){
             if($i===0&&$j<$startMonth){
                 echo '<td></td>';
             }else{
-                //echo '<td'.getDayColor($j).'>'.$day.'</td>';
-                echo "<td ".getDayColor($j).">".$day."</td>";
+                echo "<td ".getDayColor($j,$day,$year,$month).">".$day."</td>";
                 $day++;
             }
         }

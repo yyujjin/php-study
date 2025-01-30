@@ -29,5 +29,23 @@ function addEvent($events){
     $conn->close();
 }
 
+function getEvents($createdDate){
+    $conn = connectDB();
+    $stmt = $conn->prepare("SELECT * FROM yujin.calendar WHERE createdDate = ?");
+    $stmt->bind_param("s", $createdDate);
+
+    if (!$stmt->execute()) {
+        echo "오류: " . $stmt->error;
+    }
+    $result = $stmt->get_result();
+
+    // 결과 배열로 반환
+    $events = $result->fetch_all(MYSQLI_ASSOC);
+
+    $stmt->close();
+    $conn->close();
+
+    return $events;
+}
 
 ?>

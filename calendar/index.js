@@ -13,7 +13,7 @@ eventHeader.innerHTML = `${selectedDate.year}-${selectedDate.month}-${selectedDa
 for (let i = 0; i < day.length; i++) {
   day[i].addEventListener("click", function () {
     changeDate(i + 1);
-    ul.innerHTML = "";
+    getEvents();
   });
 }
 
@@ -21,20 +21,19 @@ function changeDate(i) {
   //기존 값 저장
   eventHeader.innerHTML = originalContent + "-" + i;
   selectedDate["date"] = i;
-  console.log(selectedDate);
 }
 
 function setDate() {
-  let today = new Date();
-  let year = today.getFullYear(); // 년도
-  let month = today.getMonth() + 1; // 월
-  let date = today.getDate(); // 날짜
+  let date = new Date();
+  let year = date.getFullYear(); // 년도
+  let month = ("0" + (date.getMonth() + 1)).slice(-2);
+  let day = ("0" + date.getDate()).slice(-2);
   //let day = today.getDay(); // 요일
 
   return {
     year: year,
     month: month,
-    date: date,
+    date: day,
   };
 }
 
@@ -60,7 +59,29 @@ async function addEvent() {
   }
 }
 
-function addEventToList(event) {
-  //ul.innerHTML = "";
-  ul.innerHTML += `<li>${event}</li>`;
+//날짜 클릭하면 그 날짜에 있는 일정 다 가져와서 배열만들기
+async function getEvents() {
+  const { year, month, date } = selectedDate;
+  const response = await fetch(
+    `event.php?createdDate=${year}-${month}-${date}`
+  );
+  const data = await response.json(); //JSON 데이터를 JavaScript 객체로 변환
+  makeList(data);
 }
+
+//이벤트 가져와서 리스트 만들기
+function makeList($events) {
+  ul.innerHTML = "";
+  $events.forEach((event) => {
+    ul.innerHTML += `<li>${event.events}</li>`;
+  });
+}
+
+function addEventToList(event) {
+  ul.innerHTML += `<li>${event}</li>`;
+  input.value = "";
+}
+
+//전역으로 빼서
+//그걸 값을 함수로 넣어서 값을 바꾸고
+//추가하면 그 값에다가

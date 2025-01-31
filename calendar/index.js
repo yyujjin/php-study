@@ -42,10 +42,13 @@ async function addEvent() {
   const { year, month, date } = selectedDate;
 
   try {
-    const response = await fetch(
-      `event.php?date=${year}-${month}-${date}&event=` +
-        encodeURIComponent(input.value)
-    );
+    const response = await fetch("event.php", {
+      method: "POST",
+      body: JSON.stringify({
+        event: input.value,
+        createdDate: `${year}-${month}-${date}`,
+      }),
+    });
     const textData = await response.text();
 
     if (textData == "success") {

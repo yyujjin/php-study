@@ -4,6 +4,7 @@ const originalContent = eventHeader.innerHTML; //-년-월 저장해두기
 const day = document.querySelectorAll(".day");
 const input = document.querySelector("input");
 const ul = document.querySelector("ul");
+const button = document.querySelector("button");
 
 let selectedDate = setDate();
 
@@ -37,6 +38,7 @@ function setDate() {
   };
 }
 
+//일정 추가
 async function addEvent() {
   const { year, month, date } = selectedDate;
 
@@ -52,14 +54,24 @@ async function addEvent() {
 
     if (textData == "success") {
       alert("일정이 추가되었습니다." + input.value);
-      addEventToList(input.value);
+      input.value = "";
+      //addEventToList(input.value)
+      getEvents();
     }
   } catch (error) {
     alert("잠시 후 다시 시도하세요");
   }
 }
 
-//날짜 클릭하면 그 날짜에 있는 일정 다 가져와서 배열만들기
+//일정 추가 후 리스트 하위에 추가
+//hmlt 상에서만 나타나서 그냥 추가하면 다시 api 요청해서 데이터 불러와서 처리함
+//안쓰고 있음 나중에 삭제하기
+function addEventToList(event) {
+  ul.innerHTML += `<li>${event}</li>`;
+  input.value = "";
+}
+
+//일정 조회
 async function getEvents() {
   const { year, month, date } = selectedDate;
   const response = await fetch(
@@ -73,15 +85,34 @@ async function getEvents() {
 function makeList($events) {
   ul.innerHTML = "";
   $events.forEach((event) => {
-    ul.innerHTML += `<li>${event.events}</li>`;
+    ul.innerHTML += `<li id="${event.id}">${event.events}</li>`;
   });
+  editEvent();
 }
 
-function addEventToList(event) {
-  ul.innerHTML += `<li>${event}</li>`;
-  input.value = "";
+//나중에 Hover 사용하기
+//edit 버튼 클릭하면 일정 수정할 수 있게 하기
+//add 버튼 아무것도 입력하지 않으면 경고창 날리기
+function editEvent() {
+  //   const editButtons = document.querySelectorAll(".editButton");
+  //   editButtons.forEach((editButton) => {
+  //     editButton.addEventListener("click", async function () {
+  //       try {
+  //         const response = await fetch("event.php", {
+  //           method: "POST",
+  //           body: JSON.stringify({
+  //             id: editButton.id,
+  //             event: input.value,
+  //           }),
+  //         });
+  //         const textData = await response.text();
+  //         if (textData == "success") {
+  //           alert("일정이 수정되었습니다." + input.value);
+  //           getEvents();
+  //         }
+  //       } catch (error) {
+  //         alert("잠시 후 다시 시도하세요");
+  //       }
+  //     });
+  //   });
 }
-
-//전역으로 빼서
-//그걸 값을 함수로 넣어서 값을 바꾸고
-//추가하면 그 값에다가

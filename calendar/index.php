@@ -33,7 +33,7 @@ $month = $_GET['month']??date('m');
         <h1 class="event-header"><?=$year?>-<?=$month?></h1>
         <div class="event-container">
             <div class="event-form">
-                <input autofocus type="text"> <button onclick="addEvent()">추가하기</button>
+                <input autofocus type="text"> <button onclick="addEvent()">add</button><button onclick="">edit</button>
             </div>
             <ul class="list">
             </ul>

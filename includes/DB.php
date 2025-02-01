@@ -48,5 +48,22 @@ function getEvents($createdDate){
 }
 
 //일정 수정
+function editEvent($id,$event){
+    $conn = connectDB();
+    $stmt = $conn->prepare("UPDATE yujin.calendar SET events = ? WHERE id = ?");
+    $stmt->bind_param("sd", $event,$id);
+    if (!$stmt->execute()) {
+        echo "오류: " . $stmt->error;
+    }
+
+    // 변경된 행 개수 확인
+    $updatedRows = $stmt->affected_rows;
+
+    if ($updatedRows > 0) {
+        echo "$updatedRows 개의 행이 업데이트되었습니다!";
+    } else {
+        echo "업데이트된 행이 없습니다.";
+    }
+}
 //일정 삭제
 ?>

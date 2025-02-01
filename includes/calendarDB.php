@@ -14,6 +14,7 @@ function connectDB(){
     return $conn;
 }
 
+
 function addEvent($events,$createdDate){
     $conn = connectDB();
     $stmt = $conn->prepare("INSERT INTO yujin.calendar (events, createdDate) VALUES (?, ?)");
@@ -47,6 +48,4 @@ function getEvents($createdDate){
     return $events;
 }
 
-//일정 수정
-//일정 삭제
 ?>

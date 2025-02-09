@@ -61,7 +61,7 @@ for($iz=0; $iz<count($dates); $iz++){
                     <th>토</th>
                 </tr>
 <?php
-            //$n이 뭐지
+            //$n => day
             //주 수 만큼 돌리기
             for($n=1, $i=0; $i<$total_weeks; $i++){
                 echo "<tr>";
@@ -72,7 +72,6 @@ for($iz=0; $iz<count($dates); $iz++){
                     //시작 요일 전까지 빈칸 만들기
                     if($i==0 && $k<$start_week){
                         echo "";
-                        //????????? n이뭐지
                         //1일부터 마지막날 의 숫자를 출력하기 위한 day개념인거같은데 
                         //내가 day를=1로 정의하고 day++ 한것처럼
 

@@ -3,7 +3,7 @@
 // 일정 배열
 $dates = [
     ['start' => '2024-12-15', 'end' => '2025-02-15', 'label' => '일정1', 'repeatType' => 'week', 'repeatData' => '수'],
-    ['start' => '2025-02-03', 'end' => '2025-02-28', 'label' => '일정2', 'repeatType' => 'week', 'repeatData' => '목'],
+    ['start' => '2025-02-03', 'end' => '2025-02-20', 'label' => '일정2', 'repeatType' => 'week', 'repeatData' => '목'],
     ['start' => '2023-09-15', 'end' => '2023-09-20', 'label' => '일정3', 'repeatType' => 'week', 'repeatData' => '금'],
     ['start' => '2023-09-10', 'end' => '2023-09-20', 'label' => '일정4', 'repeatType' => 'week', 'repeatData' => '월'],
 ];
@@ -110,9 +110,9 @@ function createCalendarsFromDates($dates)
 function createCalendar($dates, $year, $month)
 {
     $day = 1;
-    //데이트타임 써서 해볼가 
-    $lastDay = date('t', strtotime("$year-$month-01"));
-    $startDate = date('w', strtotime("$year-$month-01"));
+    $dateTime = new DateTime("$year-$month-01");
+    $lastDay = $dateTime->format('t');
+    $startDate = $dateTime->format('w');
     $totalWeek = ceil(($lastDay + $startDate) / 7);
 
     echo "<h3>$year 년 $month 월</h3>";
@@ -129,8 +129,9 @@ function createCalendar($dates, $year, $month)
             } elseif ($day <= $lastDay) {
                 //파라미터로 YYYY-MM-DD 형식으로 넘겨야해서 포맷해주기
                 $currentDate = sprintf("%04d-%02d-%02d", $year, $month, $day);
+
                 $labels = getLabelsForDate($dates, $currentDate); //날짜에 해당하는 라벨 가져오기
-                echo "<td" . getStyle($dates, $currentDate) . ">$day<br>$labels</td>";
+                echo "<td" . getStyle($dates, $currentDate) . ">$day<br>$labels</td>"; //스타일 적용
                 $day++;
             } else {
                 echo "<td></td>";
@@ -138,7 +139,6 @@ function createCalendar($dates, $year, $month)
         }
         echo "</tr>";
     }
-
     echo "</table>";
 }
 

@@ -62,22 +62,22 @@ function getStyle($dates, $currentDate)
 
 
 //해당 날짜에 포함되는 일정 라벨 가져오는 함수
-function getLabelsForDate($dates, $yearMonthDay)
+function getLabel($dates, $currentDate)
 {
     $labels = [];
 
     foreach ($dates as $date) {
-        $startPlanDay = new DateTime($date['start']);
-        $endPlanDay = new DateTime($date['end']);
-        $day = new DateTime($yearMonthDay);
+        $startPlanDay = $date['start'];
+        $endPlanDay = $date['end'];
+        //$day = new DateTime($currentDate);
 
-        // 일정이 해당 날짜에 포함되는지 확인
-        if ($day >= $startPlanDay && $day <= $endPlanDay) {
+        // 일정이 해당 날짜에 포함되는지 확인라벨 저장하기 
+        if ($currentDate >= $startPlanDay && $currentDate <= $endPlanDay) {
             $labels[] = $date['label'];
         }
     }
 
-    return implode("<br>", $labels); // ✅ 일정이 여러 개일 경우 줄바꿈 추가
+    return implode("<br>", $labels);
 }
 
 //날짜 범위에 따라 달력을 생성하는 함수
@@ -130,7 +130,7 @@ function createCalendar($dates, $year, $month)
                 //파라미터로 YYYY-MM-DD 형식으로 넘겨야해서 포맷해주기
                 $currentDate = sprintf("%04d-%02d-%02d", $year, $month, $day);
 
-                $labels = getLabelsForDate($dates, $currentDate); //날짜에 해당하는 라벨 가져오기
+                $labels = getLabel($dates, $currentDate); //날짜에 해당하는 라벨 가져오기
                 echo "<td" . getStyle($dates, $currentDate) . ">$day<br>$labels</td>"; //스타일 적용
                 $day++;
             } else {

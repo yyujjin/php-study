@@ -2,16 +2,16 @@
 
 // 일정 배열
 $dates = [
-    ['start' => '2024-12-15', 'end' => '2025-09-20', 'label' => '일정1', 'repeatType' => 'week', 'repeatdData' => '수'],
-    ['start' => '2025-02-03', 'end' => '2025-02-29', 'label' => '일정2', 'repeatType' => 'week', 'repeatdData' => '목'],
-    ['start' => '2025-03-15', 'end' => '2025-04-05', 'label' => '일정3', 'repeatType' => 'week', 'repeatdData' => '금'],
-    ['start' => '2023-09-10', 'end' => '2023-09-20', 'label' => '일정4', 'repeatType' => 'week', 'repeatdData' => '월'],
+    ['start' => '2024-12-15', 'end' => '2025-09-20', 'label' => '일정1', 'repeatType' => 'week', 'repeatData' => '수'],
+    ['start' => '2025-02-03', 'end' => '2025-02-29', 'label' => '일정2', 'repeatType' => 'week', 'repeatData' => '목'],
+    ['start' => '2025-03-15', 'end' => '2025-04-05', 'label' => '일정3', 'repeatType' => 'week', 'repeatData' => '금'],
+    ['start' => '2023-09-10', 'end' => '2023-09-20', 'label' => '일정4', 'repeatType' => 'week', 'repeatData' => '월'],
 ];
 
 createCalendarsFromDates($dates);
-
 //스타일 적용 함수
-function getStyle($dates, $yearMonthDay) {
+function getStyle($dates, $yearMonthDay)
+{
     $repeatDays = []; // 반복 요일 저장
     $isBold = ""; // 볼드 스타일
     $bgColor = ""; // 배경색
@@ -53,21 +53,31 @@ function getStyle($dates, $yearMonthDay) {
 }
 
 //한글 요일을 숫자로 변환
-function changeTextDateToNumberDate($textDate) {
+function changeTextDateToNumberDate($textDate)
+{
     switch ($textDate) {
-        case '일': return 0;
-        case '월': return 1;
-        case '화': return 2;
-        case '수': return 3;
-        case '목': return 4;
-        case '금': return 5;
-        case '토': return 6;
-        default: return null; // 예외 처리
+        case '일':
+            return 0;
+        case '월':
+            return 1;
+        case '화':
+            return 2;
+        case '수':
+            return 3;
+        case '목':
+            return 4;
+        case '금':
+            return 5;
+        case '토':
+            return 6;
+        default:
+            return null; // 예외 처리
     }
 }
 
 //해당 날짜에 포함되는 일정 라벨 가져오는 함수
-function getLabelsForDate($dates, $yearMonthDay) {
+function getLabelsForDate($dates, $yearMonthDay)
+{
     $labels = [];
 
     foreach ($dates as $date) {
@@ -85,7 +95,8 @@ function getLabelsForDate($dates, $yearMonthDay) {
 }
 
 //날짜 범위에 따라 달력을 생성하는 함수
-function createCalendarsFromDates($dates) {
+function createCalendarsFromDates($dates)
+{
     $startArr = array_column($dates, 'start');
     $endArr = array_column($dates, 'end');
 
@@ -110,7 +121,8 @@ function createCalendarsFromDates($dates) {
 }
 
 //달력 생성 함수
-function createCalendar($dates, $year, $month) {
+function createCalendar($dates, $year, $month)
+{
     $day = 1;
     $lastDay = date('t', strtotime("$year-$month-01"));
     $startDate = date('w', strtotime("$year-$month-01"));

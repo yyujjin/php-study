@@ -1,17 +1,17 @@
 <?php
 
 // 일정 배열
-$dates = [
+$planArr = [
     ['start' => '2024-12-15', 'end' => '2025-02-15', 'label' => '일정1', 'repeatType' => 'week', 'repeatData' => '수'],
     ['start' => '2025-02-03', 'end' => '2025-02-20', 'label' => '일정2', 'repeatType' => 'week', 'repeatData' => '목'],
     ['start' => '2023-09-15', 'end' => '2023-09-20', 'label' => '일정3', 'repeatType' => 'week', 'repeatData' => '금'],
     ['start' => '2023-09-10', 'end' => '2023-09-20', 'label' => '일정4', 'repeatType' => 'week', 'repeatData' => '월'],
 ];
 
-createCalendarsFromDates($dates);
+createCalendarsFromDates($planArr);
 
 //스타일 적용 함수
-function getStyle($dates, $currentDate)
+function getStyle($planArr, $currentDate)
 {
     $repeatDays = []; // 반복 요일 저장
     $isBold = ""; // 볼드 스타일
@@ -22,16 +22,16 @@ function getStyle($dates, $currentDate)
     $inputDate = $day->format('w'); // 현재 날짜의 요일을 숫자로 변환 (0: 일요일 ~ 6: 토요일)
 
     //배열을 순서대로 반복하면서 들어온 날짜와 일치하는 조건을 확인함
-    foreach ($dates as $date) {
-        $startPlanDay = new DateTime($date['start']);
-        $endPlanDay = new DateTime($date['end']);
+    foreach ($planArr as $plan) {
+        $startPlanDay = new DateTime($plan['start']);
+        $endPlanDay = new DateTime($plan['end']);
 
         // 일정이 해당 날짜에 포함되는지 확인
         if ($day >= $startPlanDay && $day <= $endPlanDay) {
 
             //일정의 요일을 빼내서 요일을 숫자로 바꿈
-            if ($date['repeatType'] == 'week') {
-                $convertedDay = changeTextDateToNumberDate($date['repeatData']);
+            if ($plan['repeatType'] == 'week') {
+                $convertedDay = changeTextDateToNumberDate($plan['repeatData']);
                 //요일이 배열에 없다면 저장
                 if (!in_array($convertedDay, $repeatDays)) {
                     $repeatDays[] = $convertedDay;
@@ -62,18 +62,18 @@ function getStyle($dates, $currentDate)
 
 
 //해당 날짜에 포함되는 일정 라벨 가져오는 함수
-function getLabel($dates, $currentDate)
+function getLabel($planArr, $currentDate)
 {
     $labels = [];
 
-    foreach ($dates as $date) {
-        $startPlanDay = $date['start'];
-        $endPlanDay = $date['end'];
+    foreach ($planArr as $plan) {
+        $startPlanDay = $plan['start'];
+        $endPlanDay = $plan['end'];
         //$day = new DateTime($currentDate);
 
         // 일정이 해당 날짜에 포함되는지 확인라벨 저장하기 
         if ($currentDate >= $startPlanDay && $currentDate <= $endPlanDay) {
-            $labels[] = $date['label'];
+            $labels[] = $plan['label'];
         }
     }
 
@@ -81,17 +81,17 @@ function getLabel($dates, $currentDate)
 }
 
 //날짜 범위에 따라 달력을 생성하는 함수
-function createCalendarsFromDates($dates)
+function createCalendarsFromDates($planArr)
 {
-    $startArr = array_column($dates, 'start');
-    $endArr = array_column($dates, 'end');
+    $startArr = array_column($planArr, 'start');
+    $endArr = array_column($planArr, 'end');
 
     array_multisort($startArr, $endArr); // 시작 날짜 기준으로 정렬
 
     // 중복 날짜 체크 배열
     $createdPeriod = [];
 
-    for ($i = 0; $i < count($dates); $i++) {
+    for ($i = 0; $i < count($planArr); $i++) {
         $startPlanDay = new DateTime($startArr[$i]);
         $endPlanDay = new DateTime($endArr[$i]);
 
@@ -99,7 +99,7 @@ function createCalendarsFromDates($dates)
         while ($startPlanDay->format('Y-m') <= $endPlanDay->format('Y-m')) {
             if (!in_array($startPlanDay->format('Y-m'), $createdPeriod)) {
                 $createdPeriod[] = $startPlanDay->format('Y-m');
-                createCalendar($dates, $startPlanDay->format('Y'), $startPlanDay->format('n'));
+                createCalendar($planArr, $startPlanDay->format('Y'), $startPlanDay->format('n'));
             }
             $startPlanDay->modify('+1 month');
         }
@@ -107,7 +107,7 @@ function createCalendarsFromDates($dates)
 }
 
 //달력 생성 함수
-function createCalendar($dates, $year, $month)
+function createCalendar($planArr, $year, $month)
 {
     $day = 1;
     $dateTime = new DateTime("$year-$month-01");
@@ -130,8 +130,8 @@ function createCalendar($dates, $year, $month)
                 //파라미터로 YYYY-MM-DD 형식으로 넘겨야해서 포맷해주기
                 $currentDate = sprintf("%04d-%02d-%02d", $year, $month, $day);
 
-                $labels = getLabel($dates, $currentDate); //날짜에 해당하는 라벨 가져오기
-                echo "<td" . getStyle($dates, $currentDate) . ">$day<br>$labels</td>"; //스타일 적용
+                $labels = getLabel($planArr, $currentDate); //날짜에 해당하는 라벨 가져오기
+                echo "<td" . getStyle($planArr, $currentDate) . ">$day<br>$labels</td>"; //스타일 적용
                 $day++;
             } else {
                 echo "<td></td>";

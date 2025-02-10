@@ -11,15 +11,15 @@ $planArr = [
 createCalendarsFromDates($planArr);
 
 //스타일 적용 함수
-function getStyle($planArr, $currentDate)
+function getStyle($planArr, $currentDay)
 {
     $repeatDays = []; // 반복 요일 저장
     $isBold = ""; // 볼드 스타일
     $bgColor = ""; // 배경색
     $isDuplicate = 0; // 중복 일정 카운트
 
-    $day = new DateTime($currentDate);
-    $inputDate = $day->format('w'); // 현재 날짜의 요일을 숫자로 변환 (0: 일요일 ~ 6: 토요일)
+    $day = new DateTime($currentDay);
+    $currentDate = $day->format('w'); // 현재 날짜의 요일을 숫자로 변환 (0: 일요일 ~ 6: 토요일)
 
     //배열을 순서대로 반복하면서 들어온 날짜와 일치하는 조건을 확인함
     foreach ($planArr as $plan) {
@@ -43,7 +43,7 @@ function getStyle($planArr, $currentDate)
     }
 
     //볼드체 적용 (현재 날짜의 요일이 요일 배열에 있다면)
-    if (in_array($inputDate, $repeatDays)) {
+    if (in_array($currentDate, $repeatDays)) {
         $isBold = "font-weight: bold;";
     }
 
@@ -62,7 +62,7 @@ function getStyle($planArr, $currentDate)
 
 
 //해당 날짜에 포함되는 일정 라벨 가져오는 함수
-function getLabel($planArr, $currentDate)
+function getLabel($planArr, $currentDay)
 {
     $labels = [];
 
@@ -72,7 +72,7 @@ function getLabel($planArr, $currentDate)
         //$day = new DateTime($currentDate);
 
         // 일정이 해당 날짜에 포함되는지 확인라벨 저장하기 
-        if ($currentDate >= $startPlanDay && $currentDate <= $endPlanDay) {
+        if ($currentDay >= $startPlanDay && $currentDay <= $endPlanDay) {
             $labels[] = $plan['label'];
         }
     }

@@ -68,7 +68,7 @@ function calendarForm($planArr, $year, $month)
     $startDate = $dateTime->format('w');
     $totalWeek = ceil(($startDate + $lastDay) / 7);
 
-    echo "<h3>$year 년 " . $dateTime->format('n') . "</h3>";
+    echo "<h3>$year 년 " . $dateTime->format('n') . "월</h3>";
     echo "<table border=1>";
     echo "<tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>";
 

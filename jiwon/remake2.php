@@ -5,6 +5,7 @@ $planArr = [
     ['start' => '2024-12-15', 'end' => '2025-06-15', 'label' => '일정1', 'repeatType' => 'week', 'repeatData' => '수'],
     ['start' => '2025-02-03', 'end' => '2025-02-20', 'label' => '일정2', 'repeatType' => 'week', 'repeatData' => '목'],
     ['start' => '2023-09-15', 'end' => '2023-09-20', 'label' => '일정3', 'repeatType' => 'week', 'repeatData' => '금'],
+    ['start' => '2023-09-15', 'end' => '2023-09-20', 'label' => '일정 화', 'repeatType' => 'week', 'repeatData' => '화'],
 ];
 
 //시작일 기준으로 오름차순 정렬
@@ -51,10 +52,6 @@ foreach ($planArr as $plan) {
                     } elseif ($day <= $lastDay) {
 
                         $currentDate = date('w', strtotime("$year-$month-$day")); //요일
-
-                        //여기에 들어오는 날이 조건에 해당하는지
-                        //그걸 확인하기 위해서 오늘형식으로 바꾸는데 month는 한자리로 바꾸기
-                        $month = $startDay->format('n');
                         $currentDay = "$year-$month-$day"; //지금 날짜
 
                         //일정이 중복되는지 확인
@@ -103,7 +100,6 @@ foreach ($planArr as $plan) {
                         //라벨 출력
                         $label = implode("<br>", $labels);
 
-
                         echo "<td " . $style . ">$day<br>$label</td>";
 
                         $day++;
@@ -115,7 +111,6 @@ foreach ($planArr as $plan) {
             }
             echo "</table>";
         }
-
 
         //마지막에 한달씩 추가하기
         $startDay->modify('+1 month');

@@ -10,10 +10,10 @@ $tableData = getTableContents($htmlDom);
 $formattedData = formatData($tableData);
 
 //페이징
-$tableData = paginate($formattedData);
+$paginatedData = paginate($formattedData);
 
 //검색어
-$searchedData = searchByKeyword($tableData);
+$searchedData = searchByKeyword($paginatedData);
 
 
 //결과 출력 TEST

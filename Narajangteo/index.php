@@ -51,9 +51,37 @@ foreach ($rows as $row) {
 
 
 
-//배열가공
-$tableData = formatData($data);
+//가공된 배열
+$formattedData = formatData($data);
 
+//페이징 후 얻은 테이블 데이터
+$tableData = paginate($formattedData);
+
+//결과 출력
+echo "<pre>";
+print_r($tableData);
+echo "</pre>";
+
+
+//페이징 함수 
+function paginate($array){
+
+    //한페이지에 5개 배열씩 출력
+    $limit = 5;
+
+    $totalDatas = count($array);
+    $totalPages = ceil($totalDatas / $limit);
+
+    //현재 페이지 (GET 파라미터에서 page 값 가져오기, 기본값: 1)
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    if ($page < 1 || $page > $totalPages) $page = 1; // 잘못된 페이지 방지
+
+    //이지 범위 설정 (배열 자르기)
+    $offset = ($page - 1) * $limit;
+    $paginatedArray = array_slice($array, $offset, $limit); //배열, 시작인덱스, 개수
+
+    return $paginatedArray;
+}
 
 // 배열 가공 함수
 function formatData($data) {
@@ -66,16 +94,9 @@ function formatData($data) {
             // 배열 크기가 다를 경우 대비하여 `array_slice()` 사용
             $formattedData[] = array_combine(array_slice($newKeys, 0, count($row)), $row);
         }
-       
     }
 
     return $formattedData;
 }
-
-
-//결과 출력
-echo "<pre>";
-print_r($tableData);
-echo "</pre>";
 
 ?>

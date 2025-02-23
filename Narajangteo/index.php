@@ -1,5 +1,8 @@
 <?php
 
+//aba1740.mx.co.kr/index.php?page=1search=&mode=사업일자&startDate=20250123&endDate=
+
+
 //html파일가져오기
 $htmlDom = loadHtmlAsDom("index.html");
 
@@ -65,14 +68,14 @@ function getTableContents($dom){
     // 테이블 데이터 저장 배열
     $data = [];
 
-    $rows = $table->getElementsByTagName('tr'); // ✅ 모든 <tr> 가져오기
+    $rows = $table->getElementsByTagName('tr');
     foreach ($rows as $row) {
         if (!($row instanceof DOMElement)) {
             continue; // <tr>가 아니면 무시
         }
 
         $rowData = [];
-        $cells = $row->getElementsByTagName('td'); // ✅ <td> 가져오기
+        $cells = $row->getElementsByTagName('td');
 
         foreach ($cells as $cell) {
             $rowData[] = trim($cell->nodeValue); // 텍스트만 가져와서 배열에 저장
@@ -104,17 +107,19 @@ function formatData($data) {
 //페이징 함수 
 function paginate($array){
 
-    //한페이지에 5개 배열씩 출력
+    //한페이지에 10개씩 출력
     $limit = 5;
 
     $totalDatas = count($array);
     $totalPages = ceil($totalDatas / $limit);
 
     //현재 페이지 (GET 파라미터에서 page 값 가져오기, 기본값: 1)
-    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $page = isset($_GET['page']) && $_GET['page'] !=""  ? (int)$_GET['page'] : 1;
+    echo "페이지 : $page <br>";
+
     if ($page < 1 || $page > $totalPages) $page = 1; // 잘못된 페이지 방지
 
-    //이지 범위 설정 (배열 자르기)
+    //페이지 범위 설정 (배열 자르기)
     $offset = ($page - 1) * $limit;
     $paginatedArray = array_slice($array, $offset, $limit); //배열, 시작인덱스, 개수
 
@@ -146,12 +151,12 @@ function searchByKeyword($data){
 //사업일자, 공고일자 모드에 맞게 날짜 필터해서 데이터 가져오는 함수  
 function filterDataByDateMode($data){
 
-    $mode = isset($_GET['mode']) ? trim($_GET['mode']) : "사업일자"; //기본 사업일자
+    $mode = isset($_GET['mode'])  && $_GET['mode'] !="" ? trim($_GET['mode']) : "사업일자"; //기본 사업일자
 
     // 날짜 범위 가져오기
     list($startDate, $endDate) = explode("-", getDateRange());
 
-    echo "필터링 기준: 모드 : {$mode}, 날짜 범위: {$startDate} - {$endDate} <br>";
+    echo "필터링 모드 : {$mode} <br>날짜 범위: {$startDate} - {$endDate} <br>";
 
     // 필터링 로직
     $filteredData = array_filter($data, function ($data) use ($startDate, $endDate, $mode) {
@@ -174,9 +179,9 @@ function filterDataByDateMode($data){
 //날짜 범위 가져오기
 function getDateRange() {
     // GET 요청에서 값 가져오기
-    $monthsAgo = isset($_GET['monthsAgo']) ? (int) trim($_GET['monthsAgo']) : 1; // 기본값: 1개월
-    $endDate = isset($_GET['endDate']) ? trim($_GET['endDate']) : date('Ymd'); // 기본값: 오늘 날짜
-    $startDate = isset($_GET['startDate']) ? trim($_GET['startDate']) : null; // startDate는 기본적으로 null
+    $monthsAgo = isset($_GET['monthsAgo']) && $_GET['monthsAgo'] !="" ? (int) trim($_GET['monthsAgo']) : 1; // 기본값: 1개월
+    $endDate =isset($_GET['endDate']) && $_GET['endDate'] !=""  ? trim($_GET['endDate']) : date('Ymd'); // 기본값: 오늘 날짜
+    $startDate = isset($_GET['startDate']) && $_GET['startDate'] !=""  ? trim($_GET['startDate']) : null; // startDate는 기본적으로 null
 
     // `monthsAgo` 모드가 활성화된 경우 (startDate, endDate를 직접 설정할 수 없음)
     if (isset($_GET['monthsAgo'])) {

@@ -15,13 +15,14 @@ $paginatedData = paginate($formattedData);
 //검색어
 $searchedData = searchByKeyword($paginatedData);
 
+//사업일자, 공고일자 모드에 맞게 선택된 날짜 데이터 가져오기
+$filteredDateData = filterDataByDateMode($searchedData);
+
 
 //결과 출력 TEST
 echo "<pre>";
-print_r($searchedData);
+print_r($filteredDateData);
 echo "</pre>";
-
-
 
 
 //html 가져와서 dom으로 만드는 함수
@@ -124,7 +125,7 @@ function paginate($array){
 function searchByKeyword($data){
 
     $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
-    echo "찍히는 키워드  : $keyword";
+    echo "키워드  : $keyword <br>";
 
     $searchData = [];
 
@@ -139,4 +140,69 @@ function searchByKeyword($data){
     }
     return $searchData;
 }
+
+
+
+//사업일자, 공고일자 모드에 맞게 날짜 필터해서 데이터 가져오는 함수  
+function filterDataByDateMode($data){
+
+    $mode = isset($_GET['mode']) ? trim($_GET['mode']) : "사업일자"; //기본 사업일자
+
+    // 날짜 범위 가져오기
+    list($startDate, $endDate) = explode("-", getDateRange());
+
+    echo "필터링 기준: 모드 : {$mode}, 날짜 범위: {$startDate} - {$endDate} <br>";
+
+    // 필터링 로직
+    $filteredData = array_filter($data, function ($data) use ($startDate, $endDate, $mode) {
+
+        if($mode =="사업일자"){
+            $formattedDate = str_replace("/", "", $data["사업일자"]);
+            return ($formattedDate >= $startDate && $formattedDate <= $endDate);
+        }
+        if($mode =="공고일자"){
+            $formattedDate = str_replace("/", "", $data["공고일자"]);
+            return ($formattedDate >= $startDate && $formattedDate <= $endDate);
+        }
+    });
+
+    return $filteredData;
+
+}
+
+
+//날짜 범위 가져오기
+function getDateRange() {
+    // GET 요청에서 값 가져오기
+    $monthsAgo = isset($_GET['monthsAgo']) ? (int) trim($_GET['monthsAgo']) : 1; // 기본값: 1개월
+    $endDate = isset($_GET['endDate']) ? trim($_GET['endDate']) : date('Ymd'); // 기본값: 오늘 날짜
+    $startDate = isset($_GET['startDate']) ? trim($_GET['startDate']) : null; // startDate는 기본적으로 null
+
+    // `monthsAgo` 모드가 활성화된 경우 (startDate, endDate를 직접 설정할 수 없음)
+    if (isset($_GET['monthsAgo'])) {
+        if (!in_array($monthsAgo, [1, 3, 6])) {
+            return "ERROR: monthsAgo는 1, 3, 6만 가능합니다.";
+        }
+        $startDate = date('Ymd', strtotime("-{$monthsAgo} months", strtotime($endDate)));
+    }
+
+    // `monthsAgo` 모드가 아닐 때 startDate 설정
+    if ($startDate === null) {
+        $startDate = date('Ymd', strtotime("-1 months", strtotime($endDate))); // 기본: 1개월 전
+    }
+
+    // 날짜 검증 (startDate는 endDate 이후가 될 수 없음)
+    if ($startDate > $endDate) {
+        return "ERROR: startDate는 endDate 이후가 될 수 없습니다.";
+    }
+
+    // endDate 검증 (startDate보다 이전이 될 수 없음)
+    if ($endDate < $startDate) {
+        return "ERROR: endDate는 startDate보다 이전이 될 수 없습니다.";
+    }
+
+    return "$startDate-$endDate";
+}
+
+
 ?>

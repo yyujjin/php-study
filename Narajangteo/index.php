@@ -3,16 +3,22 @@
 //html파일가져오기
 $htmlDom = loadHtmlAsDom("index.html");
 
-//table 태그 데이터 가져와서 가공하기
-$formattedData = formatData(getTableContents($htmlDom));
+//테이블 데이터 가져오기
+$tableData = getTableContents($htmlDom);
 
-//페이징 후 얻은 테이블 데이터
+//table 태그 데이터 가져와서 가공하기
+$formattedData = formatData($tableData);
+
+//페이징
 $tableData = paginate($formattedData);
 
+//검색어
+$searchedData = searchByKeyword($tableData);
 
-//결과 출력
+
+//결과 출력 TEST
 echo "<pre>";
-print_r($tableData);
+print_r($searchedData);
 echo "</pre>";
 
 
@@ -112,5 +118,25 @@ function paginate($array){
     $paginatedArray = array_slice($array, $offset, $limit); //배열, 시작인덱스, 개수
 
     return $paginatedArray;
+}
+
+//검색어 기능 함수
+function searchByKeyword($data){
+
+    $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
+    echo "찍히는 키워드  : $keyword";
+
+    $searchData = [];
+
+    // 검색어가 있을 경우 필터링 실행
+    if ($keyword !== '') {
+        $searchData = array_filter($data, function ($row) use ($keyword) {
+            //사업명에 키워드가 포함되어있다면 추출
+            return stripos($row["사업명"], $keyword) !== false;
+        });
+    } else {
+        $searchData = $data; // 검색어가 없으면 전체 데이터 유지
+    }
+    return $searchData;
 }
 ?>

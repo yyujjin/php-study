@@ -4,7 +4,7 @@
 
 
 //html파일가져오기
-$htmlDom = loadHtmlAsDom("index.html");
+$htmlDom = loadHtmlAsDom("nara.html");
 
 //테이블 데이터 가져오기
 $tableData = getTableContents($htmlDom);
@@ -108,7 +108,7 @@ function formatData($data) {
 function paginate($array){
 
     //한페이지에 10개씩 출력
-    $limit = 5;
+    $limit = 10;
 
     $totalDatas = count($array);
     $totalPages = ceil($totalDatas / $limit);
@@ -117,7 +117,7 @@ function paginate($array){
     $page = isset($_GET['page']) && $_GET['page'] !=""  ? (int)$_GET['page'] : 1;
     echo "페이지 : $page <br>";
 
-    if ($page < 1 || $page > $totalPages) $page = 1; // 잘못된 페이지 방지
+    if ($page < 1) $page = 1; // 잘못된 페이지 방지
 
     //페이지 범위 설정 (배열 자르기)
     $offset = ($page - 1) * $limit;

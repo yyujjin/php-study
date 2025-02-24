@@ -179,16 +179,17 @@ function filterDataByDateMode($data){
 //날짜 범위 가져오기
 function getDateRange() {
     // GET 요청에서 값 가져오기
-    $monthsAgo = isset($_GET['monthsAgo']) && $_GET['monthsAgo'] !="" ? (int) trim($_GET['monthsAgo']) : 1; // 기본값: 1개월
+    $monthsAgo = isset($_GET['monthsAgo']) && $_GET['monthsAgo'] !="" ? (int) trim($_GET['monthsAgo']) : null; // 기본값 null
     $endDate =isset($_GET['endDate']) && $_GET['endDate'] !=""  ? trim($_GET['endDate']) : date('Ymd'); // 기본값: 오늘 날짜
     $startDate = isset($_GET['startDate']) && $_GET['startDate'] !=""  ? trim($_GET['startDate']) : null; // startDate는 기본적으로 null
 
     // `monthsAgo` 모드가 활성화된 경우 (startDate, endDate를 직접 설정할 수 없음)
-    if (isset($_GET['monthsAgo'])) {
+    if ($monthsAgo !== null) {
         if (!in_array($monthsAgo, [1, 3, 6])) {
-            return "ERROR: monthsAgo는 1, 3, 6만 가능합니다.";
+            return "monthsAgo는 1, 3, 6만 가능합니다.";
         }
-        $startDate = date('Ymd', strtotime("-{$monthsAgo} months", strtotime($endDate)));
+        $startDate = date('Ymd', strtotime("-{$monthsAgo} months"));
+        $endDate = date('Ymd');
     }
 
     // `monthsAgo` 모드가 아닐 때 startDate 설정
@@ -198,12 +199,12 @@ function getDateRange() {
 
     // 날짜 검증 (startDate는 endDate 이후가 될 수 없음)
     if ($startDate > $endDate) {
-        return "ERROR: startDate는 endDate 이후가 될 수 없습니다.";
+        return "startDate는 endDate 이후가 될 수 없습니다.";
     }
 
     // endDate 검증 (startDate보다 이전이 될 수 없음)
     if ($endDate < $startDate) {
-        return "ERROR: endDate는 startDate보다 이전이 될 수 없습니다.";
+        return "endDate는 startDate보다 이전이 될 수 없습니다.";
     }
 
     return "$startDate-$endDate";

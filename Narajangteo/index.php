@@ -36,8 +36,6 @@ function paginate($array){
 function searchByKeyword($data){
 
     $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
-    echo "키워드  : $keyword <br>";
-
     $searchData = [];
 
     // 검색어가 있을 경우 필터링 실행
@@ -57,12 +55,7 @@ function searchByKeyword($data){
 function filterDataByDateMode($data){
 
     global $mode;
-
-    // 날짜 범위 가져오기
     list($startDate, $endDate) = explode("-", getDateRange());
-
-    echo "필터링 모드 : {$mode} <br>날짜 범위: {$startDate} - {$endDate} <br>";
-
     // 필터링 로직
     $filteredData = array_filter($data, function ($data) use ($startDate, $endDate, $mode) {
 

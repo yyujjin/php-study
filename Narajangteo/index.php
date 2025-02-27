@@ -8,35 +8,20 @@ $page = isset($_GET['page']) && $_GET['page'] !=""  ? (int)$_GET['page'] : 1;
 $tableData = getTableContents( loadHtmlAsDom("nara.html")); //테이블 데이터
 $filteredDateData = filterDataByDateMode($tableData);
 $paginatedData = paginate($filteredDateData);
-// //검색어
-// $searchedData = searchByKeyword($paginatedData);
-
-
-
-
-
-
+$finalData = searchByKeyword($paginatedData);
 
 //결과 출력 TEST
 echo "<pre>";
-print_r($paginatedData);
+print_r($finalData);
 echo "</pre>";
-
-
-
 
 //페이징 함수 
 function paginate($array){
 
-    //한페이지에 10개씩 출력
     $limit = 3;
-
     $totalDatas = count($array);
     $totalPages = ceil($totalDatas / $limit);
-
-    //현재 페이지 (GET 파라미터에서 page 값 가져오기, 기본값: 1)
-   global $page;
-    echo "페이지 : $page <br>";
+    global $page;
 
     if ($page < 1) $page = 1; // 잘못된 페이지 방지
 
@@ -83,13 +68,9 @@ function filterDataByDateMode($data){
 
         if($mode =="사업일자"){
             $formattedDate = str_replace("/", "", $data[6]);
-           // echo "배열날짜는 이거나옴 $data[6]<br>";
-           
             $tt = $formattedDate >= $startDate && $formattedDate <= $endDate;
-            //echo "여기서 리턴되는건 $tt";
             return ($formattedDate >= $startDate && $formattedDate <= $endDate);
         }
-
         if($mode =="공고일자"){
             $formattedDate = str_replace("/", "", $data[9]);
             return ($formattedDate >= $startDate && $formattedDate <= $endDate);
@@ -99,8 +80,6 @@ function filterDataByDateMode($data){
     return $filteredData;
 
 }
-
-
 
 //날짜 범위 가져오기
 function getDateRange() {
@@ -115,17 +94,14 @@ function getDateRange() {
         $startDate = date('Ymd', strtotime("-{$monthsAgo} months"));
         $endDate = date('Ymd');
     }
-
     // `monthsAgo` 모드가 아닐 때 startDate 설정
     if ($startDate === null) {
         $startDate = date('Ymd', strtotime("-1 months", strtotime($endDate))); // 기본: 1개월 전
     }
-
     // 날짜 검증 (startDate는 endDate 이후가 될 수 없음)
     if ($startDate > $endDate) {
         return "startDate는 endDate 이후가 될 수 없습니다.";
     }
-
     // endDate 검증 (startDate보다 이전이 될 수 없음)
     if ($endDate < $startDate) {
         return "endDate는 startDate보다 이전이 될 수 없습니다.";
@@ -134,28 +110,23 @@ function getDateRange() {
     return "$startDate-$endDate";
 }
 
-
-
 //html 가져와서 dom으로 만드는 함수
 function loadHtmlAsDom($htmlFile){
     $filename = $htmlFile; // 읽어올 파일명
     if (!file_exists($filename)) {
         die("오류: 파일이 존재하지 않습니다. 파일 경로를 확인하세요.");
     }
-    
     $html = file_get_contents($filename);
     if ($html === false) {
         $error = error_get_last(); // 마지막 오류 가져오기
         die("오류: 파일을 읽을 수 없습니다. 상세 오류: " . $error['message']);
     }
-    
     $dom = new DOMDocument;
     libxml_use_internal_errors(true);
     $dom->loadHTML($html);
     libxml_clear_errors();
 
     return $dom;
-    
 }
 
 //table 태그의 데이터 가져오기
@@ -166,9 +137,7 @@ function getTableContents($dom){
     if (!$table) {
         die("오류: ID가 'mf_wfm_container_testTable'인 테이블을 찾을 수 없습니다.");
     }
-
     $data = [];
-
     $rows = $table->getElementsByTagName('tr');
     foreach ($rows as $row) {
         if (!($row instanceof DOMElement)) {
@@ -184,7 +153,6 @@ function getTableContents($dom){
             $data[] = $rowData;
         }
     }
-
     $tableData = [];
     foreach ($data as $index => $row) {
         if($index%2==0){
@@ -192,8 +160,6 @@ function getTableContents($dom){
             $tableData[] = $row;
         }
     }
-
     return $tableData;
 }
-
 ?>

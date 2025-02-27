@@ -4,14 +4,14 @@ $mode = isset($_GET['mode'])  && $_GET['mode'] !="" ? trim($_GET['mode']) : "사
 $monthsAgo = isset($_GET['monthsAgo']) && $_GET['monthsAgo'] !="" ? (int) trim($_GET['monthsAgo']) : null; // 기본값 null
 $endDate =isset($_GET['endDate']) && $_GET['endDate'] !=""  ? trim($_GET['endDate']) : date('Ymd'); // 기본값: 오늘 날짜
 $startDate = isset($_GET['startDate']) && $_GET['startDate'] !=""  ? trim($_GET['startDate']) : null; // startDate는 기본적으로 null
+$page = isset($_GET['page']) && $_GET['page'] !=""  ? (int)$_GET['page'] : 1;
 $tableData = getTableContents( loadHtmlAsDom("nara.html")); //테이블 데이터
 $filteredDateData = filterDataByDateMode($tableData);
-
+$paginatedData = paginate($filteredDateData);
 // //검색어
 // $searchedData = searchByKeyword($paginatedData);
 
-//페이징
-// $paginatedData = paginate($formattedData);
+
 
 
 
@@ -19,40 +19,9 @@ $filteredDateData = filterDataByDateMode($tableData);
 
 //결과 출력 TEST
 echo "<pre>";
-//print_r($filteredDateData);
+print_r($paginatedData);
 echo "</pre>";
 
-//날짜필터 
-function filterDataByDateMode($data){
-
-    global $mode;
-
-    // 날짜 범위 가져오기
-    list($startDate, $endDate) = explode("-", getDateRange());
-
-    echo "필터링 모드 : {$mode} <br>날짜 범위: {$startDate} - {$endDate} <br>";
-
-    // 필터링 로직
-    $filteredData = array_filter($data, function ($data) use ($startDate, $endDate, $mode) {
-
-        if($mode =="사업일자"){
-            $formattedDate = str_replace("/", "", $data[6]);
-           // echo "배열날짜는 이거나옴 $data[6]<br>";
-           
-            $tt = $formattedDate >= $startDate && $formattedDate <= $endDate;
-            //echo "여기서 리턴되는건 $tt";
-            return ($formattedDate >= $startDate && $formattedDate <= $endDate);
-        }
-
-        if($mode =="공고일자"){
-            $formattedDate = str_replace("/", "", $data[9]);
-            return ($formattedDate >= $startDate && $formattedDate <= $endDate);
-        }
-    });
-
-    return $filteredData;
-
-}
 
 
 
@@ -60,13 +29,13 @@ function filterDataByDateMode($data){
 function paginate($array){
 
     //한페이지에 10개씩 출력
-    $limit = 10;
+    $limit = 3;
 
     $totalDatas = count($array);
     $totalPages = ceil($totalDatas / $limit);
 
     //현재 페이지 (GET 파라미터에서 page 값 가져오기, 기본값: 1)
-    $page = isset($_GET['page']) && $_GET['page'] !=""  ? (int)$_GET['page'] : 1;
+   global $page;
     echo "페이지 : $page <br>";
 
     if ($page < 1) $page = 1; // 잘못된 페이지 방지
@@ -99,6 +68,37 @@ function searchByKeyword($data){
 }
 
 
+//날짜필터 
+function filterDataByDateMode($data){
+
+    global $mode;
+
+    // 날짜 범위 가져오기
+    list($startDate, $endDate) = explode("-", getDateRange());
+
+    echo "필터링 모드 : {$mode} <br>날짜 범위: {$startDate} - {$endDate} <br>";
+
+    // 필터링 로직
+    $filteredData = array_filter($data, function ($data) use ($startDate, $endDate, $mode) {
+
+        if($mode =="사업일자"){
+            $formattedDate = str_replace("/", "", $data[6]);
+           // echo "배열날짜는 이거나옴 $data[6]<br>";
+           
+            $tt = $formattedDate >= $startDate && $formattedDate <= $endDate;
+            //echo "여기서 리턴되는건 $tt";
+            return ($formattedDate >= $startDate && $formattedDate <= $endDate);
+        }
+
+        if($mode =="공고일자"){
+            $formattedDate = str_replace("/", "", $data[9]);
+            return ($formattedDate >= $startDate && $formattedDate <= $endDate);
+        }
+    });
+
+    return $filteredData;
+
+}
 
 
 

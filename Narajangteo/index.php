@@ -13,8 +13,14 @@ $finalData = searchByKeyword($paginatedData);
 makeTable($finalData);
 
 function makeTable($data){
+
+    echo '<form method="GET" style="margin-bottom: 15px; text-align: center;">';
+    echo '<input type="text" name="search" placeholder="검색어 입력">';
+    echo '<button type="submit">검색</button>';
+    echo '</form>';
+
     echo "<table border=1>";
-    echo "<tr><td>No</td><td>단계구분</td><td>업무구분</td><td>사업명</td><td></td><td>사업번호</td><td>사업일자</td><td>공고/계약 기관</td><td>수요기관</td><td>공고일자</td><td>계약구분</td><td>계약방법</td><td>계약금액</td><td>참조번호</td><td>투찰</td></tr>";
+    echo "<tr><th>No</th><th>단계구분</th><th>업무구분</th><th>사업명</th><th></th><th>사업번호</th><th>사업일자</th><th>공고/계약 기관</th><th>수요기관</th><th>공고일자</th><th>계약구분</th><th>계약방법</th><th>계약금액</th><th>참조번호</th><th>투찰</th></tr>";
 
     foreach ($data as $row) {
         echo "<tr>";
@@ -22,7 +28,7 @@ function makeTable($data){
         echo "<td>" . ($row[1] ?? '') . "</td>";
         echo "<td>" . ($row[2] ?? '') . "</td>";
         echo "<td>" . ($row[3] ?? '') . "</td>";
-        echo "<td>" . ($row[4] ?? '') . "</td>"; // 빈 키 확인
+        echo "<td>" . ($row[4] ?? '') . "</td>"; 
         echo "<td>" . ($row[5] ?? '') . "</td>";
         echo "<td>" . ($row[6] ?? '') . "</td>";
         echo "<td>" . ($row[7] ?? '') . "</td>";

@@ -1,28 +1,59 @@
 <?php
 
-//aba1740.mx.co.kr/index.php?page=1search=&mode=사업일자&startDate=20250123&endDate=
-
-
-//html파일가져오기
-$htmlDom = loadHtmlAsDom("nara.html");
-
-//테이블 데이터 가져오기
-$tableData = getTableContents($htmlDom);
-
-// //페이징
-// $paginatedData = paginate($formattedData);
+$mode = isset($_GET['mode'])  && $_GET['mode'] !="" ? trim($_GET['mode']) : "사업일자"; //기본 사업일자
+$monthsAgo = isset($_GET['monthsAgo']) && $_GET['monthsAgo'] !="" ? (int) trim($_GET['monthsAgo']) : null; // 기본값 null
+$endDate =isset($_GET['endDate']) && $_GET['endDate'] !=""  ? trim($_GET['endDate']) : date('Ymd'); // 기본값: 오늘 날짜
+$startDate = isset($_GET['startDate']) && $_GET['startDate'] !=""  ? trim($_GET['startDate']) : null; // startDate는 기본적으로 null
+$tableData = getTableContents( loadHtmlAsDom("nara.html")); //테이블 데이터
+$filteredDateData = filterDataByDateMode($tableData);
 
 // //검색어
 // $searchedData = searchByKeyword($paginatedData);
 
-// //사업일자, 공고일자 모드에 맞게 선택된 날짜 데이터 가져오기
-// $filteredDateData = filterDataByDateMode($searchedData);
+//페이징
+// $paginatedData = paginate($formattedData);
+
+
+
 
 
 //결과 출력 TEST
 echo "<pre>";
-print_r($tableData);
+//print_r($filteredDateData);
 echo "</pre>";
+
+//날짜필터 
+function filterDataByDateMode($data){
+
+    global $mode;
+
+    // 날짜 범위 가져오기
+    list($startDate, $endDate) = explode("-", getDateRange());
+
+    echo "필터링 모드 : {$mode} <br>날짜 범위: {$startDate} - {$endDate} <br>";
+
+    // 필터링 로직
+    $filteredData = array_filter($data, function ($data) use ($startDate, $endDate, $mode) {
+
+        if($mode =="사업일자"){
+            $formattedDate = str_replace("/", "", $data[6]);
+           // echo "배열날짜는 이거나옴 $data[6]<br>";
+           
+            $tt = $formattedDate >= $startDate && $formattedDate <= $endDate;
+            //echo "여기서 리턴되는건 $tt";
+            return ($formattedDate >= $startDate && $formattedDate <= $endDate);
+        }
+
+        if($mode =="공고일자"){
+            $formattedDate = str_replace("/", "", $data[9]);
+            return ($formattedDate >= $startDate && $formattedDate <= $endDate);
+        }
+    });
+
+    return $filteredData;
+
+}
+
 
 
 //페이징 함수 
@@ -69,40 +100,12 @@ function searchByKeyword($data){
 
 
 
-//사업일자, 공고일자 모드에 맞게 날짜 필터해서 데이터 가져오는 함수  
-function filterDataByDateMode($data){
-
-    $mode = isset($_GET['mode'])  && $_GET['mode'] !="" ? trim($_GET['mode']) : "사업일자"; //기본 사업일자
-
-    // 날짜 범위 가져오기
-    list($startDate, $endDate) = explode("-", getDateRange());
-
-    echo "필터링 모드 : {$mode} <br>날짜 범위: {$startDate} - {$endDate} <br>";
-
-    // 필터링 로직
-    $filteredData = array_filter($data, function ($data) use ($startDate, $endDate, $mode) {
-
-        if($mode =="사업일자"){
-            $formattedDate = str_replace("/", "", $data["사업일자"]);
-            return ($formattedDate >= $startDate && $formattedDate <= $endDate);
-        }
-        if($mode =="공고일자"){
-            $formattedDate = str_replace("/", "", $data["공고일자"]);
-            return ($formattedDate >= $startDate && $formattedDate <= $endDate);
-        }
-    });
-
-    return $filteredData;
-
-}
 
 
 //날짜 범위 가져오기
 function getDateRange() {
-    // GET 요청에서 값 가져오기
-    $monthsAgo = isset($_GET['monthsAgo']) && $_GET['monthsAgo'] !="" ? (int) trim($_GET['monthsAgo']) : null; // 기본값 null
-    $endDate =isset($_GET['endDate']) && $_GET['endDate'] !=""  ? trim($_GET['endDate']) : date('Ymd'); // 기본값: 오늘 날짜
-    $startDate = isset($_GET['startDate']) && $_GET['startDate'] !=""  ? trim($_GET['startDate']) : null; // startDate는 기본적으로 null
+
+    global $monthsAgo, $endDate, $startDate;
 
     // `monthsAgo` 모드가 활성화된 경우 (startDate, endDate를 직접 설정할 수 없음)
     if ($monthsAgo !== null) {

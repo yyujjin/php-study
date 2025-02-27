@@ -2,8 +2,8 @@
 
 $mode = isset($_GET['mode']) && $_GET['mode'] !== "" ? trim($_GET['mode']) : "사업일자"; // 기본 사업일자
 $monthsAgo = isset($_GET['monthsAgo']) && $_GET['monthsAgo'] !== "" ? (int) trim($_GET['monthsAgo']) : null; 
-$endDate = isset($_GET['endDate']) && $_GET['endDate'] !== "" ? trim($_GET['endDate']) : date('Ymd');
-$startDate = isset($_GET['startDate']) && $_GET['startDate'] !== "" ? trim($_GET['startDate']) : null;
+$endDate = isset($_GET['endDate']) && $_GET['endDate'] !== "" ? str_replace("-", "", trim($_GET['endDate'])) : date('Ymd'); 
+$startDate = isset($_GET['startDate']) && $_GET['startDate'] !== "" ? str_replace("-", "", trim($_GET['startDate'])) : null; 
 $page = isset($_GET['page']) && $_GET['page'] !== "" ? (int)$_GET['page'] : 1;
 
 $tableData = getTableContents(loadHtmlAsDom("nara.html"));
@@ -15,7 +15,19 @@ $paginatedData = paginate($searchedData);
 makeTable($paginatedData);
 
 function makeTable($data) {
+
+    global $mode, $startDate, $endDate;
+
     echo '<form method="GET" style="margin-bottom: 15px; text-align: center;">';
+
+    echo '<label><input type="radio" name="mode" value="사업일자" ' . ($mode === '사업일자' ? 'checked' : '') . '> 사업일자</label>';
+    echo '<label><input type="radio" name="mode" value="공고일자" ' . ($mode === '공고일자' ? 'checked' : '') . '> 공고일자</label>';
+    echo '<br><br>';
+
+    echo '시작 날짜: <input type="date" name="startDate" value="' . $startDate . '">';
+    echo '끝 날짜: <input type="date" name="endDate" value="' . $endDate . '">';
+    echo '<br><br>';
+
     echo '<input type="text" name="search" placeholder="검색어 입력">';
     echo '<button type="submit">검색</button>';
     echo '</form>';

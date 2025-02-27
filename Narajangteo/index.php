@@ -102,39 +102,12 @@ function searchByKeyword($data) {
 
 //날짜 필터링
 function filterDataByDateMode($data) {
-    global $mode;
-    list($startDate, $endDate) = explode("-", getDateRange());
+    global $mode, $startDate, $endDate;
 
     return array_filter($data, function ($data) use ($startDate, $endDate, $mode) {
         $formattedDate = ($mode == "사업일자") ? str_replace("/", "", $data[6]) : str_replace("/", "", $data[9]);
         return ($formattedDate >= $startDate && $formattedDate <= $endDate);
     });
-}
-
-//날짜 범위 가져오기
-function getDateRange() {
-    global $monthsAgo, $endDate, $startDate;
-
-    if ($monthsAgo !== null) {
-        if (!in_array($monthsAgo, [1, 3, 6])) {
-            return "monthsAgo는 1, 3, 6만 가능합니다.";
-        }
-        $startDate = date('Ymd', strtotime("-{$monthsAgo} months"));
-        $endDate = date('Ymd');
-    }
-
-    if ($startDate === null) {
-        $startDate = date('Ymd', strtotime("-1 months", strtotime($endDate)));
-    }
-
-    if ($startDate > $endDate) {
-        return "startDate는 endDate 이후가 될 수 없습니다.";
-    }
-    if ($endDate < $startDate) {
-        return "endDate는 startDate보다 이전이 될 수 없습니다.";
-    }
-
-    return "$startDate-$endDate";
 }
 
 //HTML을 DOM으로 변환

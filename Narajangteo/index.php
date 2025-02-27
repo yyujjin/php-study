@@ -10,10 +10,38 @@ $filteredDateData = filterDataByDateMode($tableData);
 $paginatedData = paginate($filteredDateData);
 $finalData = searchByKeyword($paginatedData);
 
+makeTable($finalData);
+
+function makeTable($data){
+    echo "<table border=1>";
+    echo "<tr><td>No</td><td>단계구분</td><td>업무구분</td><td>사업명</td><td></td><td>사업번호</td><td>사업일자</td><td>공고/계약 기관</td><td>수요기관</td><td>공고일자</td><td>계약구분</td><td>계약방법</td><td>계약금액</td><td>참조번호</td><td>투찰</td></tr>";
+
+    foreach ($data as $row) {
+        echo "<tr>";
+        echo "<td>" . ($row[0] ?? '') . "</td>";
+        echo "<td>" . ($row[1] ?? '') . "</td>";
+        echo "<td>" . ($row[2] ?? '') . "</td>";
+        echo "<td>" . ($row[3] ?? '') . "</td>";
+        echo "<td>" . ($row[4] ?? '') . "</td>"; // 빈 키 확인
+        echo "<td>" . ($row[5] ?? '') . "</td>";
+        echo "<td>" . ($row[6] ?? '') . "</td>";
+        echo "<td>" . ($row[7] ?? '') . "</td>";
+        echo "<td>" . ($row[8] ?? '') . "</td>";
+        echo "<td>" . ($row[9] ?? '') . "</td>";
+        echo "<td>" . ($row[10] ?? '') . "</td>";
+        echo "<td>" . ($row[11] ?? '') . "</td>";
+        echo "<td>" . ($row[12] ?? '') . "</td>";
+        echo "<td>" . ($row[13] ?? '') . "</td>";
+        echo "<td>" . ($row[14] ?? '') . "</td>";
+        echo "</tr>";
+    }
+    echo "</table>";
+}
+
 //결과 출력 TEST
-echo "<pre>";
-print_r($finalData);
-echo "</pre>";
+// echo "<pre>";
+// print_r($finalData);
+// echo "</pre>";
 
 //페이징 함수 
 function paginate($array){

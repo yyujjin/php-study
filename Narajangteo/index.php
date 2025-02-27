@@ -1,26 +1,27 @@
 <?php
 
-$mode = isset($_GET['mode'])  && $_GET['mode'] !="" ? trim($_GET['mode']) : "사업일자"; //기본 사업일자
-$monthsAgo = isset($_GET['monthsAgo']) && $_GET['monthsAgo'] !="" ? (int) trim($_GET['monthsAgo']) : null; // 기본값 null
-$endDate =isset($_GET['endDate']) && $_GET['endDate'] !=""  ? trim($_GET['endDate']) : date('Ymd'); // 기본값: 오늘 날짜
-$startDate = isset($_GET['startDate']) && $_GET['startDate'] !=""  ? trim($_GET['startDate']) : null; // startDate는 기본적으로 null
-$page = isset($_GET['page']) && $_GET['page'] !=""  ? (int)$_GET['page'] : 1;
-$tableData = getTableContents( loadHtmlAsDom("nara.html")); //테이블 데이터
-$filteredDateData = filterDataByDateMode($tableData);
-$paginatedData = paginate($filteredDateData);
-$finalData = searchByKeyword($paginatedData);
+$mode = isset($_GET['mode']) && $_GET['mode'] !== "" ? trim($_GET['mode']) : "사업일자"; // 기본 사업일자
+$monthsAgo = isset($_GET['monthsAgo']) && $_GET['monthsAgo'] !== "" ? (int) trim($_GET['monthsAgo']) : null; 
+$endDate = isset($_GET['endDate']) && $_GET['endDate'] !== "" ? trim($_GET['endDate']) : date('Ymd');
+$startDate = isset($_GET['startDate']) && $_GET['startDate'] !== "" ? trim($_GET['startDate']) : null;
+$page = isset($_GET['page']) && $_GET['page'] !== "" ? (int)$_GET['page'] : 1;
 
-makeTable($finalData);
+$tableData = getTableContents(loadHtmlAsDom("nara.html"));
+$filteredData = filterDataByDateMode($tableData);
+$searchedData = searchByKeyword($filteredData);
+$paginatedData = paginate($searchedData);
 
-function makeTable($data){
+// HTML 테이블 출력
+makeTable($paginatedData);
 
+function makeTable($data) {
     echo '<form method="GET" style="margin-bottom: 15px; text-align: center;">';
     echo '<input type="text" name="search" placeholder="검색어 입력">';
     echo '<button type="submit">검색</button>';
     echo '</form>';
 
     echo "<table border=1>";
-    echo "<tr><th>No</th><th>단계구분</th><th>업무구분</th><th>사업명</th><th></th><th>사업번호</th><th>사업일자</th><th>공고/계약 기관</th><th>수요기관</th><th>공고일자</th><th>계약구분</th><th>계약방법</th><th>계약금액</th><th>참조번호</th><th>투찰</th></tr>";
+    echo "<tr><th>No</th><th>단계구분</th><th>업무구분</th><th>사업명</th><th>사업번호</th><th>사업일자</th><th>공고일자</th></tr>";
 
     foreach ($data as $row) {
         echo "<tr>";
@@ -28,92 +29,80 @@ function makeTable($data){
         echo "<td>" . ($row[1] ?? '') . "</td>";
         echo "<td>" . ($row[2] ?? '') . "</td>";
         echo "<td>" . ($row[3] ?? '') . "</td>";
-        echo "<td>" . ($row[4] ?? '') . "</td>"; 
         echo "<td>" . ($row[5] ?? '') . "</td>";
         echo "<td>" . ($row[6] ?? '') . "</td>";
-        echo "<td>" . ($row[7] ?? '') . "</td>";
-        echo "<td>" . ($row[8] ?? '') . "</td>";
         echo "<td>" . ($row[9] ?? '') . "</td>";
-        echo "<td>" . ($row[10] ?? '') . "</td>";
-        echo "<td>" . ($row[11] ?? '') . "</td>";
-        echo "<td>" . ($row[12] ?? '') . "</td>";
-        echo "<td>" . ($row[13] ?? '') . "</td>";
-        echo "<td>" . ($row[14] ?? '') . "</td>";
         echo "</tr>";
     }
     echo "</table>";
+
+    pageNavigation();
 }
 
-//결과 출력 TEST
-// echo "<pre>";
-// print_r($finalData);
-// echo "</pre>";
-
-//페이징 함수 
-function paginate($array){
-
+//페이징 함수
+function paginate($array) {
+    global $page, $totalPages;
     $limit = 3;
     $totalDatas = count($array);
     $totalPages = ceil($totalDatas / $limit);
-    global $page;
 
-    if ($page < 1) $page = 1; // 잘못된 페이지 방지
-
-    //페이지 범위 설정 (배열 자르기)
+    if ($page < 1) $page = 1;
     $offset = ($page - 1) * $limit;
-    $paginatedArray = array_slice($array, $offset, $limit); //배열, 시작인덱스, 개수
-
-    return $paginatedArray;
+    return array_slice($array, $offset, $limit);
 }
 
-//검색어 기능 함수
-function searchByKeyword($data){
+//페이징 UI 함수
+function pageNavigation() {
+    global $page, $totalPages;
 
-    $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
-    $searchData = [];
+    if ($totalPages <= 1) return;
 
-    // 검색어가 있을 경우 필터링 실행
-    if ($keyword !== '') {
-        $searchData = array_filter($data, function ($row) use ($keyword) {
-            //사업명에 키워드가 포함되어있다면 추출
-            return stripos($row["사업명"], $keyword) !== false;
-        });
-    } else {
-        $searchData = $data; // 검색어가 없으면 전체 데이터 유지
+    echo "<div style='text-align:center; margin-top:15px;'>";
+    if ($page > 1) {
+        echo "<a href='?page=" . ($page - 1) . "'>이전</a> ";
     }
-    return $searchData;
+
+    for ($i = 1; $i <= $totalPages; $i++) {
+        if ($i == $page) {
+            echo "<strong>[$i]</strong> ";
+        } else {
+            echo "<a href='?page=$i'>$i</a> ";
+        }
+    }
+
+    if ($page < $totalPages) {
+        echo "<a href='?page=" . ($page + 1) . "'>다음</a> ";
+    }
+    echo "</div>";
 }
 
+//검색 기능
+function searchByKeyword($data) {
+    $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
 
-//날짜필터 
-function filterDataByDateMode($data){
+    if ($keyword !== '') {
+        return array_filter($data, function ($row) use ($keyword) {
+            return stripos($row[3], $keyword) !== false; // 사업명(3번 인덱스)에서 검색
+        });
+    }
+    return $data;
+}
 
+//날짜 필터링
+function filterDataByDateMode($data) {
     global $mode;
     list($startDate, $endDate) = explode("-", getDateRange());
-    // 필터링 로직
-    $filteredData = array_filter($data, function ($data) use ($startDate, $endDate, $mode) {
 
-        if($mode =="사업일자"){
-            $formattedDate = str_replace("/", "", $data[6]);
-            $tt = $formattedDate >= $startDate && $formattedDate <= $endDate;
-            return ($formattedDate >= $startDate && $formattedDate <= $endDate);
-        }
-        if($mode =="공고일자"){
-            $formattedDate = str_replace("/", "", $data[9]);
-            return ($formattedDate >= $startDate && $formattedDate <= $endDate);
-        }
+    return array_filter($data, function ($data) use ($startDate, $endDate, $mode) {
+        $formattedDate = ($mode == "사업일자") ? str_replace("/", "", $data[6]) : str_replace("/", "", $data[9]);
+        return ($formattedDate >= $startDate && $formattedDate <= $endDate);
     });
-
-    return $filteredData;
-
 }
 
 //날짜 범위 가져오기
 function getDateRange() {
-
     global $monthsAgo, $endDate, $startDate;
 
-    // `monthsAgo` 모드가 활성화된 경우 (startDate, endDate를 직접 설정할 수 없음)
     if ($monthsAgo !== null) {
         if (!in_array($monthsAgo, [1, 3, 6])) {
             return "monthsAgo는 1, 3, 6만 가능합니다.";
@@ -121,15 +110,14 @@ function getDateRange() {
         $startDate = date('Ymd', strtotime("-{$monthsAgo} months"));
         $endDate = date('Ymd');
     }
-    // `monthsAgo` 모드가 아닐 때 startDate 설정
+
     if ($startDate === null) {
-        $startDate = date('Ymd', strtotime("-1 months", strtotime($endDate))); // 기본: 1개월 전
+        $startDate = date('Ymd', strtotime("-1 months", strtotime($endDate)));
     }
-    // 날짜 검증 (startDate는 endDate 이후가 될 수 없음)
+
     if ($startDate > $endDate) {
         return "startDate는 endDate 이후가 될 수 없습니다.";
     }
-    // endDate 검증 (startDate보다 이전이 될 수 없음)
     if ($endDate < $startDate) {
         return "endDate는 startDate보다 이전이 될 수 없습니다.";
     }
@@ -137,17 +125,16 @@ function getDateRange() {
     return "$startDate-$endDate";
 }
 
-//html 가져와서 dom으로 만드는 함수
-function loadHtmlAsDom($htmlFile){
-    $filename = $htmlFile; // 읽어올 파일명
-    if (!file_exists($filename)) {
-        die("오류: 파일이 존재하지 않습니다. 파일 경로를 확인하세요.");
+//HTML을 DOM으로 변환
+function loadHtmlAsDom($htmlFile) {
+    if (!file_exists($htmlFile)) {
+        die("오류: 파일이 존재하지 않습니다.");
     }
-    $html = file_get_contents($filename);
+    $html = file_get_contents($htmlFile);
     if ($html === false) {
-        $error = error_get_last(); // 마지막 오류 가져오기
-        die("오류: 파일을 읽을 수 없습니다. 상세 오류: " . $error['message']);
+        die("오류: 파일을 읽을 수 없습니다.");
     }
+
     $dom = new DOMDocument;
     libxml_use_internal_errors(true);
     $dom->loadHTML($html);
@@ -156,34 +143,31 @@ function loadHtmlAsDom($htmlFile){
     return $dom;
 }
 
-//table 태그의 데이터 가져오기
-function getTableContents($dom){
-
+//테이블 데이터 가져오기
+function getTableContents($dom) {
     $xpath = new DOMXPath($dom);
     $table = $xpath->query("//table[@id='mf_wfm_container_testTable']")->item(0);
     if (!$table) {
-        die("오류: ID가 'mf_wfm_container_testTable'인 테이블을 찾을 수 없습니다.");
+        die("오류: 테이블을 찾을 수 없습니다.");
     }
+
     $data = [];
     $rows = $table->getElementsByTagName('tr');
     foreach ($rows as $row) {
-        if (!($row instanceof DOMElement)) {
-            continue;
-        }
+        if (!($row instanceof DOMElement)) continue;
         $rowData = [];
-        $cells = $row->getElementsByTagName('td');
 
-        foreach ($cells as $cell) {
-            $rowData[] = trim($cell->nodeValue); 
+        foreach ($row->getElementsByTagName('td') as $cell) {
+            $rowData[] = trim($cell->nodeValue);
         }
         if (!empty($rowData)) {
             $data[] = $rowData;
         }
     }
+
     $tableData = [];
     foreach ($data as $index => $row) {
-        if($index%2==0){
-            // 배열 크기가 다를 경우 대비하여 `array_slice()` 사용
+        if ($index % 2 == 0) {
             $tableData[] = $row;
         }
     }
